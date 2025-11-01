@@ -44,8 +44,29 @@ class Card extends Component {
             textContent: this.props.content || 'Содержимое карточки'
         });
 
+        // Добавляем интерактивную кнопку
+        if (this.props.onClick) {
+            const button = this.createElement('button', {
+                className: 'card-button',
+                textContent: 'Подробнее'
+            });
+            button.addEventListener('click', () => {
+                this.props.onClick(this.props.title);
+            });
+            card.appendChild(button);
+        }
+
         card.appendChild(title);
         card.appendChild(content);
+
+        // Добавляем анимацию появления
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s, transform 0.5s';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
 
         return card;
     }
@@ -61,6 +82,54 @@ class App {
         this.renderHeader();
         this.renderMain();
         this.renderFooter();
+    }
+
+    handleCardClick(cardTitle) {
+        // Создаем модальное окно через JS
+        const modal = this.createElement('div', {
+            className: 'modal-overlay'
+        });
+
+        const modalContent = this.createElement('div', {
+            className: 'modal-content'
+        });
+
+        const modalTitle = this.createElement('h2', {
+            textContent: cardTitle
+        });
+
+        const modalText = this.createElement('p', {
+            textContent: `Вы выбрали: ${cardTitle}. Это демонстрация интерактивности через чистый JavaScript!`
+        });
+
+        const closeButton = this.createElement('button', {
+            className: 'modal-close',
+            textContent: 'Закрыть'
+        });
+
+        closeButton.addEventListener('click', () => {
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 300);
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 300);
+            }
+        });
+
+        modalContent.appendChild(modalTitle);
+        modalContent.appendChild(modalText);
+        modalContent.appendChild(closeButton);
+        modal.appendChild(modalContent);
+
+        document.body.appendChild(modal);
+
+        // Анимация появления
+        setTimeout(() => {
+            modal.style.opacity = '1';
+        }, 10);
     }
 
     renderHeader() {
@@ -136,25 +205,32 @@ class App {
         const cardsData = [
             {
                 title: 'Чистый JS',
-                content: 'Никаких фреймворков, только нативный JavaScript'
+                content: 'Никаких фреймворков, только нативный JavaScript',
+                onClick: (title) => this.handleCardClick(title)
             },
             {
                 title: 'Динамическая верстка',
-                content: 'Все элементы создаются программно через DOM API'
+                content: 'Все элементы создаются программно через DOM API',
+                onClick: (title) => this.handleCardClick(title)
             },
             {
                 title: 'Компонентный подход',
-                content: 'Используем классы для создания переиспользуемых компонентов'
+                content: 'Используем классы для создания переиспользуемых компонентов',
+                onClick: (title) => this.handleCardClick(title)
             },
             {
                 title: 'Современный дизайн',
-                content: 'Стилизация через CSS с градиентами и анимациями'
+                content: 'Стилизация через CSS с градиентами и анимациями',
+                onClick: (title) => this.handleCardClick(title)
             }
         ];
 
-        cardsData.forEach(data => {
+        cardsData.forEach((data, index) => {
             const card = new Card(data);
-            cardsGrid.appendChild(card.render());
+            const cardElement = card.render();
+            // Задержка анимации для каждой карточки
+            cardElement.style.transitionDelay = `${index * 0.1}s`;
+            cardsGrid.appendChild(cardElement);
         });
 
         cardsSection.appendChild(cardsTitle);
