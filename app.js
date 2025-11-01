@@ -1,4 +1,56 @@
-// Итерация 1: Базовая верстка через JS
+class Component {
+    constructor(props = {}) {
+        this.props = props;
+    }
+
+    createElement(tag, props = {}) {
+        const element = document.createElement(tag);
+        
+        Object.keys(props).forEach(key => {
+            if (key === 'textContent') {
+                element.textContent = props[key];
+            } else if (key === 'className') {
+                element.className = props[key];
+            } else if (key === 'style') {
+                Object.assign(element.style, props[key]);
+            } else if (key === 'children') {
+                props[key].forEach(child => {
+                    if (child instanceof Node) {
+                        element.appendChild(child);
+                    }
+                });
+            } else {
+                element[key] = props[key];
+            }
+        });
+
+        return element;
+    }
+}
+
+class Card extends Component {
+    render() {
+        const card = this.createElement('div', {
+            className: 'card'
+        });
+
+        const title = this.createElement('h3', {
+            className: 'card-title',
+            textContent: this.props.title || 'Заголовок'
+        });
+
+        const content = this.createElement('p', {
+            className: 'card-content',
+            textContent: this.props.content || 'Содержимое карточки'
+        });
+
+        card.appendChild(title);
+        card.appendChild(content);
+
+        return card;
+    }
+}
+
 class App {
     constructor() {
         this.app = document.getElementById('app');
@@ -67,8 +119,50 @@ class App {
             textContent: 'Это проект создан без использования фреймворков. Все элементы создаются динамически через нативный JavaScript.'
         });
 
+        // Добавляем секцию с карточками
+        const cardsSection = this.createElement('div', {
+            className: 'cards-section'
+        });
+
+        const cardsTitle = this.createElement('h3', {
+            className: 'cards-title',
+            textContent: 'Наши возможности'
+        });
+
+        const cardsGrid = this.createElement('div', {
+            className: 'cards-grid'
+        });
+
+        const cardsData = [
+            {
+                title: 'Чистый JS',
+                content: 'Никаких фреймворков, только нативный JavaScript'
+            },
+            {
+                title: 'Динамическая верстка',
+                content: 'Все элементы создаются программно через DOM API'
+            },
+            {
+                title: 'Компонентный подход',
+                content: 'Используем классы для создания переиспользуемых компонентов'
+            },
+            {
+                title: 'Современный дизайн',
+                content: 'Стилизация через CSS с градиентами и анимациями'
+            }
+        ];
+
+        cardsData.forEach(data => {
+            const card = new Card(data);
+            cardsGrid.appendChild(card.render());
+        });
+
+        cardsSection.appendChild(cardsTitle);
+        cardsSection.appendChild(cardsGrid);
+
         container.appendChild(title);
         container.appendChild(description);
+        container.appendChild(cardsSection);
         main.appendChild(container);
         this.app.appendChild(main);
     }
