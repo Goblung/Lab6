@@ -1,3 +1,4 @@
+
 class Component {
     constructor(props = {}) {
         this.props = props;
@@ -75,6 +76,7 @@ class Card extends Component {
 class App {
     constructor() {
         this.app = document.getElementById('app');
+        this.clickCount = 0;
         this.init();
     }
 
@@ -85,6 +87,17 @@ class App {
     }
 
     handleCardClick(cardTitle) {
+        // Увеличиваем счетчик
+        this.clickCount++;
+        if (this.counterDisplay) {
+            this.counterDisplay.textContent = `Кликов по карточкам: ${this.clickCount}`;
+            // Анимация счетчика
+            this.counterDisplay.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                this.counterDisplay.style.transform = 'scale(1)';
+            }, 200);
+        }
+
         // Создаем модальное окно через JS
         const modal = this.createElement('div', {
             className: 'modal-overlay'
@@ -150,18 +163,7 @@ class App {
             className: 'menu'
         });
 
-        const menuItems = ['Главная', 'О нас', 'Проекты', 'Контакты'];
-        menuItems.forEach(item => {
-            const li = this.createElement('li', {
-                className: 'menu-item'
-            });
-            const link = this.createElement('a', {
-                href: '#',
-                textContent: item
-            });
-            li.appendChild(link);
-            menu.appendChild(li);
-        });
+        
 
         nav.appendChild(logo);
         nav.appendChild(menu);
@@ -187,6 +189,26 @@ class App {
             className: 'description',
             textContent: 'Это проект создан без использования фреймворков. Все элементы создаются динамически через нативный JavaScript.'
         });
+
+        // Добавляем счетчик кликов
+        const counterSection = this.createElement('div', {
+            className: 'counter-section'
+        });
+
+        const counterTitle = this.createElement('h3', {
+            className: 'counter-title',
+            textContent: 'Счетчик интерактивности'
+        });
+
+        const counterDisplay = this.createElement('div', {
+            className: 'counter-display',
+            textContent: `Кликов по карточкам: ${this.clickCount}`
+        });
+
+        this.counterDisplay = counterDisplay;
+
+        counterSection.appendChild(counterTitle);
+        counterSection.appendChild(counterDisplay);
 
         // Добавляем секцию с карточками
         const cardsSection = this.createElement('div', {
@@ -238,6 +260,7 @@ class App {
 
         container.appendChild(title);
         container.appendChild(description);
+        container.appendChild(counterSection);
         container.appendChild(cardsSection);
         main.appendChild(container);
         this.app.appendChild(main);
@@ -248,12 +271,6 @@ class App {
             className: 'footer'
         });
 
-        const copyright = this.createElement('p', {
-            className: 'copyright',
-            textContent: '© 2025 Верстка на чистом JS'
-        });
-
-        footer.appendChild(copyright);
         this.app.appendChild(footer);
     }
 
